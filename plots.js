@@ -1,4 +1,5 @@
 
+function createPlots(id) {
 //Read samples.json
 d3.json("data/samples.json").then (dataLine =>  {
   console.log(dataLine)
@@ -8,12 +9,15 @@ d3.json("data/samples.json").then (dataLine =>  {
   console.log(sampleValues)
   var labels =  dataLine.samples[0].otu_labels.slice(0,10);
   console.log (labels)
-// get top 10 otu ids for OTU. 
+
+  // get top 10  
   var OTU_top = ( dataLine.samples[0].otu_ids.slice(0, 10)).reverse();
-// cast otu id's
+
+  // coerce otu id's
   var OTU_id = OTU_top.map(d => "OTU " + d);
   console.log(`OTU IDS: ${OTU_id}`)
-// get the labels
+
+  // setup the labels
   var labels =  dataLine.samples[0].otu_labels.slice(0,10);
   console.log(`OTU_labels: ${labels}`)
   var trace = {
@@ -26,9 +30,9 @@ d3.json("data/samples.json").then (dataLine =>  {
       orientation: "h",
       };
 
-// create layout variable to set plots layout
+  // create layout variable to set plots layout
   var layout = {
-      title: "Top 10 OTU",
+      title: "Top 10 OTUs",
       yaxis:{
       tickmode:"linear",
       },
@@ -38,10 +42,66 @@ d3.json("data/samples.json").then (dataLine =>  {
         t: 100,
         b: 30
         }
-      };
+   };
       
-// create data variable
-var data = [trace];
+    // create data variable
+    var data = [trace];
 
-});
+  // create the bar plot
+  Plotly.newPlot("bar", data, layout);
+
+  });
+}
+
+// function to get data
+function getDemoInfo(id) {
+  // get data from json file
+      d3.json("data/samples.json").then((data)=> {
+  // info for the demographic panel
+        var metadata = data.metadata;
+        console.log(metadata)
   
+        // filter data
+        var result = metadata.filter(meta => meta.id.toString() === id)[0];
+
+        // select panel
+        var demographicInfo = d3.select("#sample-metadata");
+          
+       // clear the panel
+        demographicInfo.html("");
+  
+       // push data to the panel
+        Object.entries(result).forEach((key) => {   
+            demographicInfo.append("h5").text(key[0].toUpperCase() + ": " + key[1] + "\n");    
+          });
+      });
+}
+
+// function for the initial render
+function init() {
+  // select dropdown element
+  var dropdown = d3.select("#selDataset");
+
+  // read the data 
+  d3.json("data/samples.json").then((data)=> {
+      console.log(data)
+
+      // get data to the dropdwown menu
+      data.names.forEach(function(name) {
+          dropdown.append("option").text(name).property("value");
+      });
+
+      // functions to display data plots
+      createPlots(data.names[0]);
+      getDemoInfo(data.names[0]);
+  });
+}
+// event handler
+function optionChanged(id) {
+  createPlots(id);
+  getDemoInfo(id);
+}
+
+
+init();
+
