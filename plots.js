@@ -30,7 +30,7 @@ function createPlots(id) {
       orientation: "h",
       };
 
-    // create layout variable to set plots layout
+    // create layout
     var layout = {
       title: "Top 10 OTUs",
       yaxis:{
@@ -43,13 +43,37 @@ function createPlots(id) {
         b: 30
         }
       };
-      
-    // create data variable
+
+    // bubble, bubble, toil and trouble...add the bubble chart
+    var trace2 = {
+      x: dataLine.samples[0].otu_ids,
+      y: dataLine.samples[0].sample_values,
+      mode: "markers",
+      marker: {
+        size: dataLine.samples[0].sample_values,
+        color: dataLine.samples[0].otu_ids
+        },
+      text: dataLine.samples[0].otu_labels
+      };
+  
+    // create layout for bubble plot
+      var layout_2 = {
+        xaxis:{title: "OTU ID"},
+        height: 600,
+        width: 1000
+        };
+
+    // create bar chart variable
     var data = [trace];
+    // creating bubble chart variable 
+    var data2 = [trace2];
 
     // create the bar plot
     Plotly.newPlot("bar", data, layout);
 
+    // create the bubble plot
+     Plotly.newPlot("bubble", data2, layout_2); 
+      
   });
 }
 
